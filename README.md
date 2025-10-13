@@ -1,6 +1,31 @@
-# LLM & SONAR-LLM Training on Tiny Stories
+# SONAR-LLM
 
 This repository contains scripts for training Large Language Models (LLM) and SONAR-LLM on the **Tiny Stories** dataset.
+
+SONAR-LLM is a sentence-level language model that uses the SONAR encoder and decoder to generate text from sentence embeddings; see [arXiv:2508.05305](https://arxiv.org/abs/2508.05305) for details.
+
+Pretrained weights are available on Hugging Face in the SONAR-LLM collection: [raxtemur/collections/sonar-llm](https://huggingface.co/collections/raxtemur/sonar-llm-68d55c63cf38fc79bfa28179).
+
+## 🚀 Quickstart: Generation
+
+```python
+from huggingface_hub import snapshot_download
+from sonarllm_model import SONARLLMGenerator, SONARLLMGenerationConfig
+
+p = snapshot_download("raxtemur/sonar-llm-300m")
+gen = SONARLLMGenerator.load_from_checkpoint(p)
+eos_emb = gen.t2vec.predict(["End of sequence."], source_lang="eng_Latn").to(gen.device)
+cfg = SONARLLMGenerationConfig(
+    temperature=0.2,
+    latent_top_p=0.9,
+    sentence_beam_size=2,
+    latent_samples_per_step=4,
+    max_sentences=4,
+)
+
+text, _ = gen.generate("Once upon a time.", eos_emb, cfg)
+print(text)
+```
 
 ---
 
@@ -77,16 +102,6 @@ torchrun --nproc_per_node=8 sonar_encoding.py \
 **Description**:  
 Generates full texts from Tiny Stories prefixes using a trained SONAR-LLM model.
 
-**Example command**:
-```bash
-python generate.py \
-  --config ./SonarLLM_900M.json \
-  --checkpoint ./checkpoint.pt \
-  --num_texts 512 \
-  --prefix_mode start \
-  --output ./generated_900M.json \
-```
-
 ---
 
 ### `evaluate_nlg.py`  
@@ -100,11 +115,6 @@ python evaluate_nlg.py generated_900M.json
 
 ---
 
-## ✅ TinyStories SONAR-LLM Checkpoints
+## ✅ Pretrained Models
 
-| Model Size        | Checkpoint Link                                                                 |
-|-------------------|----------------------------------------------------------------------------------|
-| SONAR-LLM 100M     | [Download](https://drive.google.com/file/d/18KRywQXjRQFbbVZhkUp5uaWyCuD3pEga/view?usp=sharing)                  |
-| SONAR-LLM 300M     | [Download](https://drive.google.com/file/d/1A4Fqm-w1arBRiU_V67OrfBf_Ymrm71-7/view?usp=sharing)                  |
-| SONAR-LLM 600M     | [Download](https://drive.google.com/file/d/1oG1_8whE1USC1lelF7-A9_Lhvfd2tNQm/view?usp=sharing)                  |
-| SONAR-LLM 900M     | [Download](https://drive.google.com/file/d/1lzUkUNbFQkeYLp69FYrLA1vAB3--WbrY/view?usp=sharing)                  |
+See the Hugging Face collection for all released checkpoints: [SONAR-LLM collection](https://huggingface.co/collections/raxtemur/sonar-llm-68d55c63cf38fc79bfa28179).
