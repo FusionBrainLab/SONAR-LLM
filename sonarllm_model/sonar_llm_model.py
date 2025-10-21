@@ -59,6 +59,7 @@ class SONARLLMGenerationConfig:
     decoder_temperature: float = 1.0  # default in fairseq2
     normalize_sentence_scores: bool = True  # False → sum of token log-probs
     decoder_max_len: int = 256
+    target_lang: str = "eng_Latn"
 
     # Latent sampling
     temperature: float = 0
@@ -202,7 +203,7 @@ class SONARLLMGenerator(torch.nn.Module):
 
             texts, scores = self.sonar_decoder.predict(
                 z,
-                target_lang="eng_Latn",
+                target_lang=self._cfg.target_lang,
                 beam_size=int(self._cfg.decoder_beam_size),
                 normalize_scores=bool(self._cfg.normalize_sentence_scores),
                 max_seq_len=self._cfg.decoder_max_len,
