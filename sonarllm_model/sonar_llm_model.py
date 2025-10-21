@@ -60,6 +60,7 @@ class SONARLLMGenerationConfig:
     normalize_sentence_scores: bool = True  # False → sum of token log-probs
     decoder_max_len: int = 256
     target_lang: str = "eng_Latn"
+    source_lang: str = "eng_Latn"
 
     # Latent sampling
     temperature: float = 0
@@ -148,7 +149,7 @@ class SONARLLMGenerator(torch.nn.Module):
             sents = [prefix_text.strip()]
 
         # Initialize prefix embeddings
-        emb_seq = self.t2vec.predict(sents, source_lang="eng_Latn").to(self.device)
+        emb_seq = self.t2vec.predict(sents, source_lang=self._cfg.source_lang).to(self.device)
 
         # Beam state tuple: (sentences, embeddings_seq, cumulative_score, recent_dirs)
         beams: List[BeamState] = [
@@ -212,7 +213,7 @@ class SONARLLMGenerator(torch.nn.Module):
             )
             text = texts[0]
 
-            z_re = self.t2vec.predict([text], source_lang="eng_Latn").to(self.device)
+            z_re = self.t2vec.predict([text], source_lang=self._cfg.target_lang).to(self.device)
             # z_re = self.forward_proj(z_re.unsqueeze(0)) if z_re.ndim == 2 else self.forward_proj(z_re)
             difference = z_re - z
             cos = F.cosine_similarity(z_re, z, dim=1).item()
