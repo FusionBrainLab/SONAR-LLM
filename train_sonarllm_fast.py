@@ -342,7 +342,8 @@ def main():
     val_items = torch.load('./sonar_embeddings_ts_100_shuffle/tiny_stories_sonar_embeddings_val.pt')
     if is_main_process:
         print("Validation data ready")
-    val_dataset = NextSentenceEmbeddingDataset(val_items['val'], max_sentences=32)
+    val_key = 'validation' if 'validation' in val_items else 'val'
+    val_dataset = NextSentenceEmbeddingDataset(val_items[val_key], max_sentences=32)
     if distributed:
         val_sampler = DistributedSampler(val_dataset, shuffle=False)
     else:
