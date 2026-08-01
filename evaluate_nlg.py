@@ -59,8 +59,10 @@ def process_record(rec: dict):
     ref_full = ref_full[len(prefix) :]
 
     # First sentence only
-    gen_sent = sent_tokenize(gen_full, language="english")[0] if gen_full else ""
-    ref_sent = sent_tokenize(ref_full, language="english")[0] if ref_full else ""
+    gen_sents = sent_tokenize(gen_full, language="english") if gen_full else []
+    ref_sents = sent_tokenize(ref_full, language="english") if ref_full else []
+    gen_sent = gen_sents[0] if gen_sents else ""
+    ref_sent = ref_sents[0] if ref_sents else ""
 
     bleu, rouge_l = evaluate_text(gen_sent, ref_sent)
     meteor = evaluate_meteor(gen_sent, ref_sent)
